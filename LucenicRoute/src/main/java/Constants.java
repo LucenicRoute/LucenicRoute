@@ -15,6 +15,8 @@ public class Constants {
     public static final String QUERY_NARR_FIELD_PREFIX = "<narr> Narrative:";
     public static final String END_OF_QUERY_PREFIX = "</top>";
 
+    // TODO: update to relative path
+    public static final String TOPIC_FILEPATH = "/Users/chrisnixon/Documents/yr5/IR/LucenicRoute/LucenicRoute/LucenicRoute/src/main/resources/topics";
     public static final String NUM_FIELD_KEY = "num";
     public static final String TITLE_FIELD_KEY = "title";
     public static final String DESC_FIELD_KEY = "desc";
