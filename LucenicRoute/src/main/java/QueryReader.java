@@ -18,6 +18,19 @@ import org.apache.lucene.search.Query;
 
 public class QueryReader {
 
+    // Only for testing and debugging
+    public static void main(String[] args) {
+        List<Query> queries = null;
+        try {
+            queries = getQueries(Constants.TOPIC_FILEPATH);
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+        for (final Query query : queries) {
+            System.out.println("QUERY:" + query.toString() + "\n\n");
+        }
+    }
+
     public static List<Query> getQueries(final String filepath) throws IOException, ParseException {
         final ArrayList<Query> returnQueries = new ArrayList<Query>();
 
@@ -69,14 +82,21 @@ public class QueryReader {
         return rawQueries;
     }
 
-    // For each topic produces a string containing the title, description and narrative fields in lowercase with stopwords removed.
+    /*
+    *  The title, description and narrative fields are all processed seperately. They are converted to lowercase and stopwords are removed.
+    *  The query string is then formed from the concatenation of these three processed strings.
+    *
+    *  For example, for the first topic the resulting query string will be: "foreign minorities germany what language cultural differences 
+    *  impede integration foreign minorities germany relevant document focus causes lack integration significant way mere mention immigration 
+    *  difficulties relevant documents discuss immigration problems unrelated germany also relevant "
+    */
     public static List<String> processQueries(final List<HashMap<String,String>> rawQueries) throws IOException {
         final ArrayList<String> processedQueries = new ArrayList<>();
         StringBuilder stringBuilder = new StringBuilder();
-        for (HashMap<String,String> rawQuery : rawQueries) {
-            String processedTitle = removeStopWords(rawQuery.get(Constants.TITLE_FIELD_KEY));
-            String processedDesc = removeStopWords(rawQuery.get(Constants.DESC_FIELD_KEY));
-            String processedNarr = removeStopWords(rawQuery.get(Constants.NARR_FIELD_KEY));
+        for (final HashMap<String,String> rawQuery : rawQueries) {
+            final String processedTitle = removeStopWords(rawQuery.get(Constants.TITLE_FIELD_KEY));
+            final String processedDesc = removeStopWords(rawQuery.get(Constants.DESC_FIELD_KEY));
+            final String processedNarr = removeStopWords(rawQuery.get(Constants.NARR_FIELD_KEY));
             stringBuilder.append(processedTitle);
             stringBuilder.append(processedDesc);
             stringBuilder.append(processedNarr);
@@ -89,11 +109,11 @@ public class QueryReader {
     // Removes stop words from a given string
     // Converts string to lowercase
     // Removes punctuation
-    public static String removeStopWords(String textFile) throws IOException {
-        StringBuilder stringBuilder = new StringBuilder();
-        Analyzer analyzer = new StandardAnalyzer(EnglishAnalyzer.getDefaultStopSet());
-        TokenStream tokenStream = analyzer.tokenStream("CONTENTS", new StringReader(textFile));
-        CharTermAttribute term = tokenStream.addAttribute(CharTermAttribute.class);
+    public static String removeStopWords(final String text) throws IOException {
+        final StringBuilder stringBuilder = new StringBuilder();
+        final Analyzer analyzer = new StandardAnalyzer(EnglishAnalyzer.getDefaultStopSet());
+        final TokenStream tokenStream = analyzer.tokenStream("CONTENTS", new StringReader(text));
+        final CharTermAttribute term = tokenStream.addAttribute(CharTermAttribute.class);
         tokenStream.reset();
         while(tokenStream.incrementToken()) {
             stringBuilder.append(term.toString()).append(" ");
