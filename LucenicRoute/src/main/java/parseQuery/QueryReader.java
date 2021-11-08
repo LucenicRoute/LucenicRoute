@@ -26,7 +26,7 @@ public class QueryReader {
     public static void main(String[] args) {
         List<Query> queries = null;
         try {
-            queries = getQueries(Constants.TOPIC_FILEPATH);
+            queries = retrieveQueries(Constants.TOPIC_FILEPATH);
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
@@ -35,7 +35,7 @@ public class QueryReader {
         }
     }
 
-    public static List<Query> getQueries(final String filepath) throws IOException, ParseException {
+    public static List<Query> retrieveQueries(final String filepath) throws IOException, ParseException {
         final ArrayList<Query> returnQueries = new ArrayList<Query>();
 
         final List<HashMap<String, String>> rawQueries = parseQueries(filepath);
