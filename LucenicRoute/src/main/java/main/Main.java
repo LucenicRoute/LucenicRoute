@@ -13,8 +13,9 @@ public class Main {
 		FBISParser fbis = new FBISParser();
 		FTParser ft = new FTParser();
 		try {
-			List<Document>  documentList = fbis.getFBISDocs();
-			documentList.addAll(ft.parseFT());
+			List<Document>  documentList = FTParser.parseFT();
+			documentList.addAll(fbis.getFBISDocs());
+			documentList.get(1);
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}

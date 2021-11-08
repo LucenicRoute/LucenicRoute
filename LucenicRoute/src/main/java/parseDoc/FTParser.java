@@ -1,60 +1,74 @@
 package parseDoc;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import util.CreateDocument;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FTParser {
 
-    private static String path = "Input/ft"; //directory containing Financial Times
+    private static String INPUT_DIR = "Input/ft/"; //directory containing Financial Times
 
+//    public static void main(String[] args) throws IOException {
+//        List<org.apache.lucene.document.Document> docs = parseFT();
+//        System.out.println(docs.get(0));
+//    }
 
     public static List<org.apache.lucene.document.Document> parseFT() throws IOException {
-        File directoryPath = new File(path); //give path to directory
-        // create filter to open only directories, don't want to open the README
-        FileFilter textFilefilter = new FileFilter(){
-            public boolean accept(File file) {
-                boolean isFile = file.isDirectory();
-                if (isFile) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        };
         List<org.apache.lucene.document.Document> documentList= new ArrayList<org.apache.lucene.document.Document>();
+        List<Path> directoryPaths = listDirPaths();
+        List<Path> filePaths = new ArrayList<Path>();
 
-        //create array of all the Financial Times directories.
-        File directoryFolders[] = directoryPath.listFiles(textFilefilter);
-        for(File directory:directoryFolders) {
-            File currListFiles[] = directory.listFiles(); //for each directory get all the files
-            for(File file:currListFiles) {
-                Document doc = Jsoup.parse(file, "UTF-8"); //parse each file with jsoup
-//                System.out.println(doc);
-                Elements documents = doc.select("doc"); //extract each doc in each file
-                for (Element docs : documents) { //for each doc in a file
-
-                    String docID = docs.select("docno").text(); //find docno of current doc
-                    String title = docs.select("headline").text(); //find the title of the current doc
-                    String content = docs.select("text").text(); //find content of current doc.
-                    org.apache.lucene.document.Document finalDoc = CreateDocument.createDocument(docID, title, content);
-                    documentList.add(finalDoc);
-//                    System.out.println(docno);
-//                    System.out.println(title);
-//                    System.out.println(content);
-//                    System.out.println(finalDoc);
-                }
+        // for each path, get the files
+        for (Path path : directoryPaths) {
+            try(Stream<Path> fileWalk = Files.walk(path)) {
+                filePaths.addAll(fileWalk.filter(Files::isRegularFile)
+                        .collect(Collectors.toList()));
             }
         }
+        filePaths.forEach(file -> {
+            //parse Doc
+            File currFile = new File(file.toString());
+//            System.out.println(currFile);
+            try {
+                Document currDoc = Jsoup.parse(currFile, "UTF-8");
+//                System.out.println(currDoc);
+                Elements elements = currDoc.select("doc");
+                for(Element element:elements) {
+                    String docID = element.select("docno").text();
+                    String title = element.select("headline").text();
+                    String content = element.select("text").text();
+                    org.apache.lucene.document.Document finalDoc = CreateDocument.createDocument(docID,title,content);
+                    documentList.add(finalDoc);
+//                    System.out.println(currLucDoc);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
         return documentList;
+    }
+
+    public static List<Path> listDirPaths() throws IOException {
+        List<Path> filePaths;
+        Path input_dir = Paths.get(INPUT_DIR);
+        try (Stream<Path> walk = Files.walk(input_dir,1)) {
+            filePaths = walk.filter(Files::isDirectory)
+                    .collect(Collectors.toList());
+        }
+        filePaths.remove(0);
+        return filePaths;
+
     }
 
 //    public org.apache.lucene.document.Document createDocument(String docid, String title, String content)
