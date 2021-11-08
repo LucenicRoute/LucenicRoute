@@ -1,3 +1,5 @@
+package parseQuery;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Path;
@@ -15,6 +17,8 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
+
+import util.Constants;
 
 public class QueryReader {
 
