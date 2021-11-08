@@ -6,6 +6,7 @@ import org.apache.lucene.document.Document;
 
 import parseDoc.FBISParser;
 import parseDoc.FTParser;
+import parseDoc.LATimesParser;
 
 public class Main {
 
@@ -18,6 +19,15 @@ public class Main {
 			documentList.get(1);
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
+		}
+		
+		LATimesParser lat = new LATimesParser();
+		
+		try {
+			lat.InitializeParsing();
+			System.out.println("The documents were parsed for the Los Angeles Times. Completed...");	
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 }
