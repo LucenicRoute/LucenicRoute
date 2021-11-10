@@ -21,7 +21,7 @@ import org.apache.lucene.search.Query;
 import util.Constants;
 
 public class QueryReader {
-
+	 
     // Only for testing and debugging
     public static void main(String[] args) {
         List<Query> queries = null;
@@ -32,6 +32,7 @@ public class QueryReader {
         }
         for (final Query query : queries) {
             System.out.println("QUERY:" + query.toString() + "\n\n");
+            //searching
         }
     }
 
