@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.lucene.document.Document;
 
 import parseDoc.FBISParser;
+import parseDoc.FR94Parser;
 import parseDoc.FTParser;
 import parseDoc.LATimesParser;
 
@@ -12,7 +13,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		FBISParser fbis = new FBISParser();
-		FTParser ft = new FTParser();
+		//FTParser ft = new FTParser();
 		try {
 			List<Document>  documentList = FTParser.parseFT();
 			documentList.addAll(fbis.getFBISDocs());
@@ -29,5 +30,16 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		FR94Parser fr94 = new FR94Parser();
+
+		try {
+			fr94.parseFR("Input/fr94");
+			System.out.println("Completed..");	
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
 	}
 }

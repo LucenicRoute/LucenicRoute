@@ -14,7 +14,7 @@ import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.TextField;
 
 public class FR94Parser {
-	public static List<Document> parseFR(String filePath) throws Exception {
+	public  List<Document> parseFR(String filePath) throws Exception {
 		//each DOC is a new lucene document, although it might only contain part of an article
 		List<Document> docList = new ArrayList<Document>();
 
@@ -123,6 +123,8 @@ public class FR94Parser {
 		                doc.add(new Field("Contents", contentsb.toString(), ft));
 		                doc.add(new Field("Parent ID", currParent, ft));
 		                docList.add(doc);
+		                System.out.println(doc);
+		             
 		                //once the end of the file is reached we add the final document
 
 		            } catch (Exception ex) {
