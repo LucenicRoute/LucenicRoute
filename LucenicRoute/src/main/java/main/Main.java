@@ -13,7 +13,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		FBISParser fbis = new FBISParser();
-		//FTParser ft = new FTParser();
+		FTParser ft = new FTParser();
 		try {
 			List<Document>  documentList = FTParser.parseFT();
 			documentList.addAll(fbis.getFBISDocs());
