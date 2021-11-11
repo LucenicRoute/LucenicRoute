@@ -41,7 +41,7 @@ public class LATimesParser {
 		filesPaths.remove(731);
 		filesPaths.remove(0);
 
-		System.out.println("The files are stored for Los Angeles Times. Completed...");
+		//System.out.println("The files are stored for Los Angeles Times. Completed...");
 
 		return parseLATimes(filesPaths);
 	}
