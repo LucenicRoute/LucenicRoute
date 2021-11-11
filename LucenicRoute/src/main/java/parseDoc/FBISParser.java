@@ -32,23 +32,25 @@ public class FBISParser {
 		        if (Files.isRegularFile(filePath)) {
 		        	//get the file content
 		        	File file = new File(filePath.toString());
-		        	try {
-		        		//parse the document with JSOUP
-			        	org.jsoup.nodes.Document d = Jsoup.parse(file, "UTF-8");
-						Elements elements = d.select("DOC");
-						for(Element element: elements) {
-							doc = new Document();
-							documentNo = element.select("DOCNO").text();
-							title = element.select("HEADER").select("TI").text();
-							text = element.select("TEXT").text();
-							//create the document 
-							doc = CreateDocument.createDocument(documentNo, title, text);
-							//add document to document list
-							documentList.add(doc);
+		        	if(!file.getName().startsWith("read")) {
+			        	try {
+			        		//parse the document with JSOUP
+				        	org.jsoup.nodes.Document d = Jsoup.parse(file, "UTF-8");
+							Elements elements = d.select("DOC");
+							for(Element element: elements) {
+								doc = new Document();
+								documentNo = element.select("DOCNO").text();
+								title = element.select("HEADER").select("TI").text();
+								text = element.select("TEXT").text();
+								//create the document 
+								doc = CreateDocument.createDocument(documentNo, title, text);
+								//add document to document list
+								documentList.add(doc);
+							}
+			        	} catch (IOException e) {
+							System.out.println("Exception occured while reading FBIS file");
 						}
-		        	} catch (IOException e) {
-						System.out.println("Exception occured while reading FBIS file");
-					}
+		        	}
 		        }
 		    });
 		}

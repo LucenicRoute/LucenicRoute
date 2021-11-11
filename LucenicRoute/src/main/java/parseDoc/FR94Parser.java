@@ -4,23 +4,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-
-import java.util.*;
-import java.util.regex.*;
-import java.util.stream.Stream;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.TextField;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -44,23 +38,25 @@ public class FR94Parser {
 		        if (Files.isRegularFile(filePath)) {
 		        	//get the file content
 		        	File file = new File(filePath.toString());
-		        	try {
-		        		//parse the document with JSOUP
-			        	org.jsoup.nodes.Document d = Jsoup.parse(file, "UTF-8");
-						Elements elements = d.select("DOC");
-						for(Element element: elements) {
-							doc = new Document();
-							documentNo = element.select("DOCNO").text();
-							parentNo = element.select("PARENT").text();
-							text = element.select("TEXT").text();
-							//create the document 
-							doc = CreateDocument.createDocument(documentNo, parentNo, text);
-							//add document to document list
-							documentList.add(doc);
+		        	if(!file.getName().startsWith("read")) {
+			        	try {
+			        		//parse the document with JSOUP
+				        	org.jsoup.nodes.Document d = Jsoup.parse(file, "UTF-8");
+							Elements elements = d.select("DOC");
+							for(Element element: elements) {
+								doc = new Document();
+								documentNo = element.select("DOCNO").text();
+								parentNo = element.select("PARENT").text();
+								text = element.select("TEXT").text();
+								//create the document 
+								doc = CreateDocument.createDocument(documentNo, parentNo, text);
+								//add document to document list
+								documentList.add(doc);
+							}
+			        	} catch (IOException e) {
+							System.out.println("Exception occured while reading FR file");
 						}
-		        	} catch (IOException e) {
-						System.out.println("Exception occured while reading FR file");
-					}
+		        	}
 		        }
 		    }
 			);

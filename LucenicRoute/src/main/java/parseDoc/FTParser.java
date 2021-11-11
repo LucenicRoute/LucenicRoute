@@ -1,10 +1,4 @@
 package parseDoc;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import util.CreateDocument;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,16 +9,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import util.CreateDocument;
+
 public class FTParser {
 
     private static String INPUT_DIR = "Input/ft/"; //directory containing Financial Times
 
-//    public static void main(String[] args) throws IOException {
-//        List<org.apache.lucene.document.Document> docs = parseFT();
-//        System.out.println(docs.get(0));
-//    }
-
-    public static List<org.apache.lucene.document.Document> parseFT() throws IOException {
+    public List<org.apache.lucene.document.Document> parseFT() throws IOException {
         List<org.apache.lucene.document.Document> documentList= new ArrayList<org.apache.lucene.document.Document>();
         List<Path> directoryPaths = listDirPaths();
         List<Path> filePaths = new ArrayList<Path>();
@@ -39,21 +35,23 @@ public class FTParser {
         filePaths.forEach(file -> {
             //parse Doc
             File currFile = new File(file.toString());
-//            System.out.println(currFile);
-            try {
-                Document currDoc = Jsoup.parse(currFile, "UTF-8");
-//                System.out.println(currDoc);
-                Elements elements = currDoc.select("doc");
-                for(Element element:elements) {
-                    String docID = element.select("docno").text();
-                    String title = element.select("headline").text();
-                    String content = element.select("text").text();
-                    org.apache.lucene.document.Document finalDoc = CreateDocument.createDocument(docID,title,content);
-                    documentList.add(finalDoc);
-//                    System.out.println(currLucDoc);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+            if(!currFile.getName().startsWith("read")) {
+	            //System.out.println(currFile);
+	            try {
+	                Document currDoc = Jsoup.parse(currFile, "UTF-8");
+	                //System.out.println(currDoc);
+	                Elements elements = currDoc.select("doc");
+	                for(Element element:elements) {
+	                    String docID = element.select("docno").text();
+	                    String title = element.select("headline").text();
+	                    String content = element.select("text").text();
+	                    org.apache.lucene.document.Document finalDoc = CreateDocument.createDocument(docID,title,content);
+	                    documentList.add(finalDoc);
+	                    //System.out.println(currLucDoc);
+	                }
+	            } catch (IOException e) {
+	                e.printStackTrace();
+	            }
             }
         });
         return documentList;

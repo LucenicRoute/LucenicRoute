@@ -19,10 +19,10 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 
 import parseQuery.QueryReader;
+import util.Constants;
 
 public class searchEngine {
 	
-	public static final String INDEX_DIRECTORY = "index";
 	public static final String RESULT_DIRECTORY = "results";
 	
 	private void searchAndWrite(Query query, IndexSearcher iscr, PrintWriter wr) throws IOException {
@@ -43,7 +43,7 @@ public class searchEngine {
 		
 		QueryReader qr = new QueryReader();
 		List<Query> queriesList= qr.startSearch();	
-		IndexReader rdr = DirectoryReader.open(FSDirectory.open(Paths.get(INDEX_DIRECTORY)));
+		IndexReader rdr = DirectoryReader.open(FSDirectory.open(Paths.get(Constants.INDEX_DIRECTORY)));
 		PrintWriter wr = new PrintWriter(RESULT_DIRECTORY, "UTF-8");
         IndexSearcher scr = new IndexSearcher(rdr);
         

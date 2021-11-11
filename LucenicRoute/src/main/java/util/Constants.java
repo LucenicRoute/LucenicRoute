@@ -14,6 +14,7 @@ public final class Constants {
 	public final static String DOCUMENTID = "DocumnetId";
 	public final static String TITLE = "Title";
 	public final static String AUTHOR = "Author";
+	public static final String INDEX_DIRECTORY = "index/";
 
 	// Query constants
     public static final String TITLE_QUERY_FIELD = "Title";
