@@ -3,9 +3,17 @@ package parseDoc;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 
 import java.util.*;
 import java.util.regex.*;
+import java.util.stream.Stream;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
@@ -13,18 +21,68 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.TextField;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import util.CreateDocument;
+
 public class FR94Parser {
-	public  List<Document> parseFR(String filePath) throws Exception {
+
+	public final static String INPUT_DIRECTORY = "Input/fr94/";
+
+	public List<Document> getFRDocs(String filepathString) throws IOException{
+		
+		List<Document> documentList = new ArrayList<>();
+		//read each file from the given location
+		try (Stream<Path> filePathStream=Files.walk(Paths.get(filepathString))) {
+		    filePathStream.forEach(filePath -> {
+		    	Document doc = null;
+		    	String documentNo = "";
+		    	String parentNo = "";
+				String text = "";
+		        if (Files.isRegularFile(filePath)) {
+		        	//get the file content
+		        	File file = new File(filePath.toString());
+		        	try {
+		        		//parse the document with JSOUP
+			        	org.jsoup.nodes.Document d = Jsoup.parse(file, "UTF-8");
+						Elements elements = d.select("DOC");
+						for(Element element: elements) {
+							doc = new Document();
+							documentNo = element.select("DOCNO").text();
+							parentNo = element.select("PARENT").text();
+							text = element.select("TEXT").text();
+							//create the document 
+							doc = CreateDocument.createDocument(documentNo, parentNo, text);
+							//add document to document list
+							documentList.add(doc);
+						}
+		        	} catch (IOException e) {
+						System.out.println("Exception occured while reading FR file");
+					}
+		        }
+		    }
+			);
+		}
+		
+		return documentList;
+	}
+
+
+	public List<Document> parseFR(String filePath) throws Exception {
 		//each DOC is a new lucene document, although it might only contain part of an article
 		List<Document> docList = new ArrayList<Document>();
 
 		int docCount = 0;
+		/*
 		String[] stopWords = new String[] { "hyph", "blank", "sect", "para", "cir", "rsquo", "mu", "times", "bull",
 		        "ge", "reg", "cent", "amp", "gt", "lt", "acirc", "ncirc", "atilde", "ntilde", "otilde", "utilde",
 		        "aacute", "cacute", "eacute", "Eacute", "Gacute", "iacute", "lacute", "nacute", "oacute", "pacute",
 		        "racute", "sacute", "uacute", "ocirc", "auml", "euml", "Euml", "iuml", "Iuml", "Kuml", "Ouml", "ouml",
 		        "uuml", "Ccedil", "ccedil", "agrave", "Agrave", "egrave", "Egrave", "igrave", "Ograve", "ograve",
 		        "ugrave" };
+				*/
 		int fileCount = 0;
 
 		//for loops cycle through the files if we start in fr94
@@ -33,9 +91,9 @@ public class FR94Parser {
 		    if (monthDir.isDirectory()) {
 		        File files[] = monthDir.listFiles();
 		        for (File file : files) {
-		            System.out.println("num: " + fileCount);
+		            //System.out.println("num: " + fileCount);
 		            fileCount++;
-		            System.out.println(monthDir.getName() + file.getName() + "\n");
+		            //System.out.println(monthDir.getName() + file.getName() + "\n");
 		            BufferedReader br = new BufferedReader(new FileReader(file));
 
 		            String line = null;
@@ -52,6 +110,7 @@ public class FR94Parser {
 		            FieldType ft = new FieldType(TextField.TYPE_STORED);
 
 		            try {
+
 		                while ((line = br.readLine()) != null) {
 		                    if (line.startsWith("<DOC>")) {
 		                        docCount++;
@@ -86,13 +145,13 @@ public class FR94Parser {
 		                    else if (line.startsWith("<!-- PJG ITAG l=56 g=1 f=1 -->")
 		                            || line.startsWith("<!-- PJG ITAG l=52 g=1 f=1 -->")) {
 		                        //these are the tags that correspond to titles in the file
-		                        line = br.readLine();
-		                        while (line.startsWith("<") == false) {
-		                            line = line.replaceAll("_", " ");
-		                            titlesb.append(" ");
-		                            titlesb.append(line);
-		                            line = br.readLine();
-		                        }
+		                        //line = br.readLine();
+		                        //while (line.startsWith("<") == false) {
+		                        //    line = line.replaceAll("_", " ");
+		                        //    titlesb.append(" ");
+		                        //    titlesb.append(line);
+		                        //    line = br.readLine();
+		                        //}
 		                        doc.add(new Field("Title", titlesb.toString(), ft));
 		                        titlesb.delete(0, titlesb.length());
 
@@ -109,11 +168,11 @@ public class FR94Parser {
 		                        //the rest of the content is read in here
 		                        String currCont = line.replaceAll("\\(\\w\\)", " ");
 
-		                        for (int i = 0; i < stopWords.length; i++) {
+		                        //for (int i = 0; i < stopWords.length; i++) {
 		                            // removing the stopwords eg &blank representing a blank space
-		                            String replaceString = "&" + stopWords[i];
-		                            currCont = currCont.replaceAll(replaceString, " ");
-		                        }
+		                        //    String replaceString = "&" + stopWords[i];
+		                        //    currCont = currCont.replaceAll(replaceString, " ");
+		                        //}
 		                        
 		                        contentsb.append(currCont);
 		                        contentsb.append(" ");
@@ -123,8 +182,6 @@ public class FR94Parser {
 		                doc.add(new Field("Contents", contentsb.toString(), ft));
 		                doc.add(new Field("Parent ID", currParent, ft));
 		                docList.add(doc);
-		                System.out.println(doc);
-		             
 		                //once the end of the file is reached we add the final document
 
 		            } catch (Exception ex) {
@@ -248,7 +305,6 @@ public class FR94Parser {
 		                br.close();
 
 		            }
-
 		        }
 		    }
 		}

@@ -23,17 +23,18 @@ import util.Constants;
 public class QueryReader {
 	 
     // Only for testing and debugging
-    public static void main(String[] args) {
+    public List<Query> startSearch() {
         List<Query> queries = null;
         try {
             queries = retrieveQueries(Constants.TOPIC_FILEPATH);
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
-        for (final Query query : queries) {
-            System.out.println("QUERY:" + query.toString() + "\n\n");
-            //searching
-        }
+        return queries;
+//        for (final Query query : queries) {
+//            System.out.println("QUERY:" + query.toString() + "\n\n");
+//            //searching
+//        }
     }
 
     public static List<Query> retrieveQueries(final String filepath) throws IOException, ParseException {
