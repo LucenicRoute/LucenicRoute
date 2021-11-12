@@ -91,12 +91,13 @@ public class Main {
 				System.out.println("Failed to index documents.");
 				System.out.println(e.getMessage());
 			}
-			System.out.println("Documnet indexed succefully.");
+			System.out.println("Document indexed successfully.");
 		}
 
 		searchEngine se = new searchEngine();
 		try {
 			se.searching();
+			System.out.println("Searching completed successfully.");
 		} catch (IOException e) {
 			System.out.println("Error while searching documents.");
 			System.out.println(e.getMessage());

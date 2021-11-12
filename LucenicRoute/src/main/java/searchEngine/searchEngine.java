@@ -28,14 +28,14 @@ public class searchEngine {
 	private void searchAndWrite(Query query, IndexSearcher iscr, PrintWriter wr) throws IOException {
 		
 		//Our size is 528160
-		//TopDocs results = searcher.search(query, 528160);
+		//TopDocs res = iscr.search(query, 528160);
 		// for the test purpose
 		TopDocs res = iscr.search(query, 1000);
         ScoreDoc[] scr = res.scoreDocs;
 
         for (int i = 0; i < scr.length; i++) {
-            Document doc = iscr.doc(scr[i].doc);
-            wr.println(i + " 0 " + doc.get("DOCNO") + " " + i + " " + scr[i].score + " LucenicRoute");
+            //Document doc = iscr.doc(scr[i].doc);
+            wr.println(i + " 0 " + "DOC" + " " + i + " " + scr[i].score + " LucenicRoute");
         }
 	}
 	
