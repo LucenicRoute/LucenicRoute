@@ -28,18 +28,18 @@ public class Main {
 		Path directory = Paths.get(Constants.INDEX_DIRECTORY);
 		
 		if(!Files.exists(directory)) {
-//			try {
-//				System.out.println("Parsing FT...");
-//				long startTime = System.nanoTime();
-//				documentList.addAll(ft.parseFT());
-//				long endTime = System.nanoTime();
-//				long timeElapsed = endTime - startTime;
-//				System.out.print("FT Complete:\tTime taken = " + timeElapsed / 1000000 + "ms\tTotal Corpus Size = "
-//						+ (documentList.size()) + "\n");
-//			} catch (IOException e) {
-//				System.out.println("Failed to parse FT");
-//				System.out.println(e.getMessage());
-//			}
+			try {
+				System.out.println("Parsing FT...");
+				long startTime = System.nanoTime();
+				documentList.addAll(ft.parseFT());
+				long endTime = System.nanoTime();
+				long timeElapsed = endTime - startTime;
+				System.out.print("FT Complete:\tTime taken = " + timeElapsed / 1000000 + "ms\tTotal Corpus Size = "
+						+ (documentList.size()) + "\n");
+			} catch (IOException e) {
+				System.out.println("Failed to parse FT");
+				System.out.println(e.getMessage());
+			}
 	
 			try {
 				System.out.println("Parsing FBIS...");
