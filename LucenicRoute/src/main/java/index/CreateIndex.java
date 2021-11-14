@@ -3,6 +3,7 @@ package index;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
@@ -46,32 +47,32 @@ public class CreateIndex {
 		long startTime = System.nanoTime();
 		ftParser.parseFT(iwriter);
 		long endTime = System.nanoTime();
-		long timeElapsed = endTime-startTime;
-		System.out.print("FT Indexed:\tTime taken = " + timeElapsed / 1000000 + "\n");
+		long timeElapsed = TimeUnit.NANOSECONDS.toSeconds(endTime-startTime);
+		System.out.print("FT Indexed:\tTime taken = " + timeElapsed + "s\n");
 
 		startTime = System.nanoTime();
 		fbisParser.getFBISDocs(iwriter);
 		endTime = System.nanoTime();
-		timeElapsed = endTime-startTime;
-		System.out.print("FBIS Indexed:\tTime taken = " + timeElapsed / 1000000 + "\n");
+		timeElapsed = TimeUnit.NANOSECONDS.toSeconds(endTime-startTime);
+		System.out.print("FBIS Indexed:\tTime taken = " + timeElapsed + "s\n");
 
 		startTime = System.nanoTime();
 		laTimesParser.InitializeParsing(iwriter);
 		endTime = System.nanoTime();
-		timeElapsed = endTime-startTime;
-		System.out.print("LATimes Indexed:\tTime taken = " + timeElapsed / 1000000 + "\n");
+		timeElapsed = TimeUnit.NANOSECONDS.toSeconds(endTime-startTime);
+		System.out.print("LATimes Indexed:\tTime taken = " + timeElapsed + "s\n");
 
 		startTime = System.nanoTime();
 		fr94Parser.getFRDocs(iwriter);
 		long totalTimeEnd  = endTime = System.nanoTime();
-		timeElapsed = endTime-startTime;
+		timeElapsed = TimeUnit.NANOSECONDS.toSeconds(endTime-startTime);
 
-		long totalTimeElapsed = totalTimeEnd-totalTimeStart;
-		System.out.print("FR Indexed:\tTime taken = " + timeElapsed / 1000000 + "\n");
+		long totalTimeElapsed = TimeUnit.NANOSECONDS.toSeconds(totalTimeEnd-totalTimeStart);
+		System.out.print("FR Indexed:\tTime taken = " + timeElapsed + "s\n");
 
 		// close the writer and directory obj
 		iwriter.close();
 		directory.close();
-		System.out.println("Files indexed succefully.\tTotal time taken = " + totalTimeElapsed/1000000);
+		System.out.println("Files indexed succefully.\tTotal time taken = " + totalTimeElapsed + "s");
 	}
 }
