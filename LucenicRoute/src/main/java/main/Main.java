@@ -26,5 +26,14 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		searchEngine se = new searchEngine();
+		try {
+			se.searching();
+			System.out.println("Searching completed successfully.");
+		} catch (IOException e) {
+			System.out.println("Error while searching documents.");
+			System.out.println(e.getMessage());
+		}
 	}
 }
