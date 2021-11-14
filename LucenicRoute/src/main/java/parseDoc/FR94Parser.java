@@ -126,7 +126,7 @@ public class FR94Parser {
 
 		                        currDoc = line.replaceAll("<\\w*>", " ");//removing <[tags]>
 		                        currDoc = currDoc.replaceAll("<.*>", " ");
-		                        currDoc = currDoc.strip();
+//		                        currDoc = currDoc.strip();
 
 		                        doc = new Document();
 		                        doc.add(new Field("Document ID", currDoc, ft));
@@ -136,7 +136,7 @@ public class FR94Parser {
 		                        prevParent = currParent;
 		                        currParent = line.replaceAll("<\\w*>", " ");
 		                        currParent = currParent.replaceAll("<.*>", " ");
-		                        currParent = currParent.strip();
+//		                        currParent = currParent.strip();
 		                    } 
 		                    else if (line.startsWith("<!-- PJG ITAG l=56 g=1 f=1 -->")
 		                            || line.startsWith("<!-- PJG ITAG l=52 g=1 f=1 -->")) {
@@ -239,13 +239,13 @@ public class FR94Parser {
 		                        prevDoc = currDoc;
 		                        currDoc = line.replaceAll("<\\w*>", " ");
 		                        currDoc = currDoc.replaceAll("<.*>", " ");
-		                        currDoc = currDoc.strip();
+//		                        currDoc = currDoc.strip();
 		                    } 
 		                    else if (line.startsWith("<PARENT>")) {
 		                        prevParent = currParent;
 		                        currParent = line.replaceAll("<\\w*>", " ");
 		                        currParent = currParent.replaceAll("<.*>", " ");
-		                        currParent = currParent.strip();
+//		                        currParent = currParent.strip();
 		                        if (currParent.equals(prevParent) == false) {
 		                            //if twe have a new parent document we push the previous docuemnt to list and create a new one
 		                            doc.add(new Field("Contents", contentsb.toString(), ft));
