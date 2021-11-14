@@ -21,41 +21,40 @@ public class FTParser {
     private static String INPUT_DIR = "Input/ft/"; //directory containing Financial Times
 
     public List<org.apache.lucene.document.Document> parseFT() throws IOException {
-        List<org.apache.lucene.document.Document> documentList= new ArrayList<org.apache.lucene.document.Document>();
+        List<org.apache.lucene.document.Document> documentList = new ArrayList<org.apache.lucene.document.Document>();
         List<Path> directoryPaths = listDirPaths();
         List<Path> filePaths = new ArrayList<Path>();
 
-        // for each path, get the files
         for (Path path : directoryPaths) {
-            try (Stream<Path> fileWalk = Files.walk(Paths.get(String.valueOf(path)))) {
-                fileWalk.forEach(file -> {
-                    if (Files.isRegularFile(file)) {
-                        //parse Doc
-                        File currFile = new File(file.toString());
-                        if (!currFile.getName().startsWith("read")) {
-                            //System.out.println(currFile);
-                            try {
-                                Document currDoc = Jsoup.parse(currFile, "UTF-8");
-                                //System.out.println(currDoc);
-                                Elements elements = currDoc.select("doc");
-                                for (Element element : elements) {
-                                    String docID = element.select("docno").text();
-                                    String title = element.select("headline").text();
-                                    String content = element.select("text").text();
-                                    org.apache.lucene.document.Document finalDoc = CreateDocument.createDocument(docID, title, content);
-                                    documentList.add(finalDoc);
-                                    //System.out.println(currLucDoc);
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                });
+            try (Stream<Path> fileWalk = Files.walk(path)) {
+                filePaths.addAll(fileWalk.filter(Files::isRegularFile)
+                                .collect(Collectors.toList()));
             }
         }
+        for (Path file : filePaths) {
+            File currFile = new File(file.toString());
+            if(!currFile.getName().startsWith("read")) {
+                try {
+                    Document currDoc = Jsoup.parse(currFile, "UTF-8");
+                    //System.out.println(currDoc);
+                    Elements elements = currDoc.select("doc");
+                    for (Element element : elements) {
+                        String docID = element.select("docno").text();
+                        String title = element.select("headline").text();
+                        String content = element.select("text").text();
+                        org.apache.lucene.document.Document finalDoc = CreateDocument.createDocument(docID, title, content);
+                        documentList.add(finalDoc);
+                        //System.out.println(currLucDoc);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         return documentList;
     }
+
 
     public static List<Path> listDirPaths() throws IOException {
         List<Path> filePaths;
