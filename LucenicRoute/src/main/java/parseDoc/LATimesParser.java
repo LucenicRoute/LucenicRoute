@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.apache.lucene.index.IndexWriter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -23,9 +24,9 @@ public class LATimesParser {
 
 	//List<LATimesDocument> latDocsList = new ArrayList<LATimesDocument>();
 	List<String> filesPaths = new ArrayList<String>();
-	List<org.apache.lucene.document.Document> luceneDocstList= new ArrayList<org.apache.lucene.document.Document>();
+//	List<org.apache.lucene.document.Document> luceneDocstList= new ArrayList<org.apache.lucene.document.Document>();
 
-	public  List<org.apache.lucene.document.Document>  InitializeParsing() throws IOException {
+	public void InitializeParsing(IndexWriter indexWriter) throws IOException {
 
 		try (Stream<Path> docPath = Files.walk(Paths.get(directory))) {
 			docPath.forEach(filePath -> filesPaths.add(filePath.toString()));
@@ -42,11 +43,11 @@ public class LATimesParser {
 		filesPaths.remove(0);
 
 		//System.out.println("The files are stored for Los Angeles Times. Completed...");
-
-		return parseLATimes(filesPaths);
+		parseLATimes(filesPaths, indexWriter);
+//		return parseLATimes(filesPaths, indexWriter);
 	}
 
-	public  List<org.apache.lucene.document.Document>  parseLATimes(List<String> docsList) throws IOException {
+	public void parseLATimes(List<String> docsList, IndexWriter indexWriter) throws IOException {
 
 		for (String docPath : docsList) {
 //			System.out.println("Parsing is starting for " + docPath);
@@ -55,27 +56,30 @@ public class LATimesParser {
 						new InputStreamReader(stream, StandardCharsets.UTF_8));
 
 				String validRow = bufferedReader.readLine();
+				int i =0;
 				while (validRow != null) {
-
 					String wholeContent = "";
 					while (!validRow.equals("</DOC>")) {
 						wholeContent += validRow;
 						validRow = bufferedReader.readLine();
+						if (validRow==null) {
+							break;
+						}
 					}
 					wholeContent += validRow;
 					validRow = bufferedReader.readLine();
 
 					Document document = Jsoup.parse(wholeContent);
-					getFeaturesFromParsedDoc(document);
+					getFeaturesFromParsedDoc(document, indexWriter);
 				}
 //				System.out.println("Completed...");
 			}
 		}
 
-		return luceneDocstList;
+//		return luceneDocstList;
 	}
 
-	private void getFeaturesFromParsedDoc(Document doc) {
+	private void getFeaturesFromParsedDoc(Document doc, IndexWriter indexWriter) {
 
 //		LATimesDocument laDoc = new LATimesDocument();
 //
@@ -97,8 +101,13 @@ public class LATimesParser {
 		String text = doc.select("TEXT").text(); 
 
 		org.apache.lucene.document.Document midDoc = CreateDocument.createDocument(docNo,headline,text);
-		
-		luceneDocstList.add(midDoc);
+		try {
+			indexWriter.addDocument(midDoc);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+//		luceneDocstList.add(midDoc);
 	}
 
 }

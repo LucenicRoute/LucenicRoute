@@ -15,6 +15,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.IndexWriter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -25,11 +26,11 @@ public class FR94Parser {
 
 	public final static String INPUT_DIRECTORY = "Input/fr94/";
 
-	public List<Document> getFRDocs(String filepathString) throws IOException{
+	public List<Document> getFRDocs(IndexWriter indexWriter) throws IOException{
 		
 		List<Document> documentList = new ArrayList<>();
 		//read each file from the given location
-		try (Stream<Path> filePathStream=Files.walk(Paths.get(filepathString))) {
+		try (Stream<Path> filePathStream=Files.walk(Paths.get(INPUT_DIRECTORY))) {
 		    filePathStream.forEach(filePath -> {
 		    	Document doc = null;
 		    	String documentNo = "";
@@ -51,7 +52,7 @@ public class FR94Parser {
 								//create the document 
 								doc = CreateDocument.createDocument(documentNo, parentNo, text);
 								//add document to document list
-								documentList.add(doc);
+								indexWriter.addDocument(doc);
 							}
 			        	} catch (IOException e) {
 							System.out.println("Exception occured while reading FR file");

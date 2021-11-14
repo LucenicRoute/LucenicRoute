@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.lucene.index.IndexWriter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,7 +21,7 @@ public class FTParser {
 
     private static String INPUT_DIR = "Input/ft/"; //directory containing Financial Times
 
-    public List<org.apache.lucene.document.Document> parseFT() throws IOException {
+    public List<org.apache.lucene.document.Document> parseFT(IndexWriter indexWriter) throws IOException {
         List<org.apache.lucene.document.Document> documentList = new ArrayList<org.apache.lucene.document.Document>();
         List<Path> directoryPaths = listDirPaths();
         List<Path> filePaths = new ArrayList<Path>();
@@ -43,7 +44,7 @@ public class FTParser {
                                 title = element.select("headline").text();
                                 content = element.select("text").text();
                                 org.apache.lucene.document.Document finalDoc = CreateDocument.createDocument(docID, title, content);
-                                documentList.add(finalDoc);
+                                indexWriter.addDocument(finalDoc);
                                 //System.out.println(currLucDoc);
                             }
                         } catch (IOException e) {
