@@ -27,28 +27,30 @@ public class FTParser {
 
         for (Path path : directoryPaths) {
             try (Stream<Path> fileWalk = Files.walk(path)) {
-                filePaths.addAll(fileWalk.filter(Files::isRegularFile)
-                                .collect(Collectors.toList()));
-            }
-        }
-        for (Path file : filePaths) {
-            File currFile = new File(file.toString());
-            if(!currFile.getName().startsWith("read")) {
-                try {
-                    Document currDoc = Jsoup.parse(currFile, "UTF-8");
-                    //System.out.println(currDoc);
-                    Elements elements = currDoc.select("doc");
-                    for (Element element : elements) {
-                        String docID = element.select("docno").text();
-                        String title = element.select("headline").text();
-                        String content = element.select("text").text();
-                        org.apache.lucene.document.Document finalDoc = CreateDocument.createDocument(docID, title, content);
-                        documentList.add(finalDoc);
-                        //System.out.println(currLucDoc);
+                fileWalk.filter(Files::isRegularFile)
+                        .forEach(file -> {
+                    File currFile = new File(file.toString());
+                    String docID = null;
+                    String title = null;
+                    String content = null;
+                    if (!currFile.getName().startsWith("read")) {
+                        try {
+                            Document currDoc = Jsoup.parse(currFile, "UTF-8");
+                            //System.out.println(currDoc);
+                            Elements elements = currDoc.select("doc");
+                            for (Element element : elements) {
+                                docID = element.select("docno").text();
+                                title = element.select("headline").text();
+                                content = element.select("text").text();
+                                org.apache.lucene.document.Document finalDoc = CreateDocument.createDocument(docID, title, content);
+                                documentList.add(finalDoc);
+                                //System.out.println(currLucDoc);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                });
             }
         }
 
