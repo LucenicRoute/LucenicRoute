@@ -25,17 +25,20 @@ public class searchEngine {
 	
 	public static final String RESULT_DIRECTORY = "results";
 	
-	private void searchAndWrite(Query query, String queryID, IndexSearcher iscr, PrintWriter wr) throws IOException {
+	private void searchAndWrite(Query query, String queryID, IndexSearcher isrch, PrintWriter wr) throws IOException {
 		
 		//Our size is 528160
 		//TopDocs res = iscr.search(query, 528160);
 		// for the test purpose
-		TopDocs res = iscr.search(query, 1000);
+		TopDocs res = isrch.search(query, 1000);
+		
         ScoreDoc[] scr = res.scoreDocs;
 
         for (int i = 0; i < scr.length; i++) {
             //Document doc = iscr.doc(scr[i].doc);
-            wr.println(queryID + " 0 " + "DOC" + " " + i + " " + scr[i].score + " LucenicRoute");
+			Document hitDoc = isrch.doc(scr[i].doc);
+			//System.out.println(hitDoc.getFields());
+            wr.println(queryID + " 0 " + hitDoc.get("DocumentId") + " " + i + " " + scr[i].score + " LucenicRoute");
         }
 	}
 	
@@ -46,10 +49,10 @@ public class searchEngine {
 		List<String> queryIDs = qr.getQueryIDs();	
 		IndexReader rdr = DirectoryReader.open(FSDirectory.open(Paths.get(Constants.INDEX_DIRECTORY)));
 		PrintWriter wr = new PrintWriter(RESULT_DIRECTORY, "UTF-8");
-        IndexSearcher scr = new IndexSearcher(rdr);
+        IndexSearcher isrch = new IndexSearcher(rdr);
         
         for (int i=0; i<queriesList.size(); i++) {
-        	searchAndWrite(queriesList.get(i), queryIDs.get(i), scr, wr);
+        	searchAndWrite(queriesList.get(i), queryIDs.get(i), isrch, wr);
 		}
 		
         rdr.close();
