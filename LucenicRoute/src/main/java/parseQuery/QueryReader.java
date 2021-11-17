@@ -21,26 +21,34 @@ import org.apache.lucene.search.Query;
 import util.Constants;
 
 public class QueryReader {
-	 
-    // Only for testing and debugging
-    public List<Query> startSearch() {
-        List<Query> queries = null;
+    public List<Query> queries;
+    public List<String> queryIDs;
+
+    public QueryReader() {
         try {
-            queries = retrieveQueries(Constants.TOPIC_FILEPATH);
+            constructQueries(Constants.TOPIC_FILEPATH);
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
-        return queries;
-//        for (final Query query : queries) {
-//            System.out.println("QUERY:" + query.toString() + "\n\n");
-//            //searching
-//        }
     }
 
-    public static List<Query> retrieveQueries(final String filepath) throws IOException, ParseException {
+    public List<Query> retrieveQueries() {
+        return this.queries;
+    }
+
+    public List<String> getQueryIDs() {
+        return this.queryIDs;
+    }
+
+    public void constructQueries(final String filepath) throws IOException, ParseException {
         final ArrayList<Query> returnQueries = new ArrayList<Query>();
+        final ArrayList<String> returnQueryIDs = new ArrayList<String>();
 
         final List<HashMap<String, String>> rawQueries = parseQueries(filepath);
+        for (HashMap<String,String> rawQuery : rawQueries) {
+            returnQueryIDs.add(rawQuery.get(Constants.NUM_FIELD_KEY));
+        }
+
         final List<String> processedQueries = processQueries(rawQueries);
         
         final String[] queryFields = new String[] {Constants.TITLE_QUERY_FIELD, Constants.CONTENT_QUERY_FIELD, Constants.AUTHOR_QUERY_FIELD};
@@ -50,8 +58,8 @@ public class QueryReader {
             final Query query = parser.parse(processedQuery);
             returnQueries.add(query);
         }
-
-        return returnQueries;
+        this.queries = returnQueries;
+        this.queryIDs = returnQueryIDs;
     }
 
     public static List<HashMap<String, String>> parseQueries(final String filepath) throws IOException {
