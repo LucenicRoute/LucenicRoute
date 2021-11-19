@@ -28,15 +28,27 @@ public class FR94Parser {
 
 	public List<Document> getFRDocs(IndexWriter indexWriter) throws IOException{
 		
+
 		List<Document> documentList = new ArrayList<>();
 		//read each file from the given location
 		try (Stream<Path> filePathStream=Files.walk(Paths.get(INPUT_DIRECTORY))) {
+
+
 		    filePathStream.forEach(filePath -> {
 		    	Document doc = null;
 		    	String documentNo = "";
 		    	String parentNo = "";
 				String text = "";
-		        if (Files.isRegularFile(filePath)) {
+				String title = "";
+				String authorAndDept = "";
+				String date = "";
+
+
+				int docsWith = 0;
+				int docsWithOut = 0;
+				String pathname = filePath.toString();
+
+				if (Files.isRegularFile(filePath)) {
 		        	//get the file content
 		        	File file = new File(filePath.toString());
 		        	if(!file.getName().startsWith("read")) {
@@ -48,8 +60,23 @@ public class FR94Parser {
 								doc = new Document();
 								documentNo = element.select("DOCNO").text();
 								parentNo = element.select("PARENT").text();
+								//text = element.select("TEXT").text();
+								title = element.select("TEXT").select("DOCTITLE").text();
+								authorAndDept = element.select("TEXT").select("AUTHOR").text() + " " + element.select("TEXT").select("USDEPT").text() + " " + element.select("TEXT").select("USBUREAU").text() + " " + element.select("TEXT").select("AGENCY").text();
+								date = element.select("TEXT").select("DATE").text();
 								text = element.select("TEXT").text();
-								//create the document 
+
+								// //create the document 
+								// if(title.equals("") == false && title != null){
+								// 	docsWith = docsWith+1;
+								// 	//System.out.println("TITLE: " + title + "\n");
+								// }
+								// else{
+								// 	docsWithOut++;
+								// }
+								//System.out.println("DOCNO: " + documentNo + "\n");
+								//System.out.println("PARENT: " + parentNo + "\n");
+								//System.out.println("TEXT: " + text + "\n");
 								doc = CreateDocument.createDocument(documentNo, parentNo, text);
 								//add document to document list
 								indexWriter.addDocument(doc);
@@ -59,10 +86,13 @@ public class FR94Parser {
 						}
 		        	}
 		        }
+				//System.out.println(pathname + "DOC RATIO: " + docsWith + " : " + docsWithOut);
+
 		    }
 			);
+
 		}
-		
+
 		return documentList;
 	}
 
