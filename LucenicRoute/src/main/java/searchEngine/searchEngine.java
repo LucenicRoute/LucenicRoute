@@ -41,6 +41,7 @@ public class searchEngine {
 			//System.out.println(hitDoc.getFields());
             wr.println(queryID + " 0 " + hitDoc.get("DocumentId") + " " + i + " " + scr[i].score + " LucenicRoute");
         }
+		wr.flush();
 	}
 	
 	public void searching(final float customK1Value, final float customBValue) throws IOException {
@@ -57,6 +58,7 @@ public class searchEngine {
         	searchAndWrite(queriesList.get(i), queryIDs.get(i), isrch, wr);
 		}
 		
+		wr.close();
         rdr.close();
 	}
 }
