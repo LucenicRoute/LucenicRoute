@@ -46,11 +46,10 @@ public class Main {
 
 		searchEngine se = new searchEngine();
 		try {
-			se.searching();
+			se.searching(Constants.DEFAULT_BM25_K1_VALUE, Constants.DEFAULT_BM25_B_VALUE);
 			System.out.println("Searching completed successfully.");
-		} catch (IOException e) {
-			System.out.println("Error while searching documents.");
-			System.out.println(e.getMessage());
+		} catch (final IOException e) {
+			System.out.printf("Error while searching documents.\n%s\n",e.getMessage());
 		}
 	}
 

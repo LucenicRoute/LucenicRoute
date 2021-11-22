@@ -16,6 +16,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.store.FSDirectory;
 
 import parseQuery.QueryReader;
@@ -42,7 +43,7 @@ public class searchEngine {
         }
 	}
 	
-	public void searching() throws IOException {
+	public void searching(final float customK1Value, final float customBValue) throws IOException {
 		
 		QueryReader qr = new QueryReader();
 		List<Query> queriesList= qr.retrieveQueries();
@@ -50,6 +51,7 @@ public class searchEngine {
 		IndexReader rdr = DirectoryReader.open(FSDirectory.open(Paths.get(Constants.INDEX_DIRECTORY)));
 		PrintWriter wr = new PrintWriter(RESULT_DIRECTORY, "UTF-8");
         IndexSearcher isrch = new IndexSearcher(rdr);
+		isrch.setSimilarity(new BM25Similarity(customK1Value, customBValue));
         
         for (int i=0; i<queriesList.size(); i++) {
         	searchAndWrite(queriesList.get(i), queryIDs.get(i), isrch, wr);

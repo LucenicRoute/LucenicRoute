@@ -9,9 +9,13 @@ import java.nio.charset.StandardCharsets;
  */
 public final class Constants {
 
-    //Arguments
+    // Arguments
     public final static String BUILD_INDEX_SHORT = "-ci";
     public final static String BUILD_INDEX_LONG = "--create-index";
+
+    // Magic numbers
+    public static final float DEFAULT_BM25_K1_VALUE = 1.2f;
+    public static final float DEFAULT_BM25_B_VALUE = 0.75f;
 	
 	public final static Integer MAX_RESULTS = 1400;
 	public final static String CONTENT = "Content";
