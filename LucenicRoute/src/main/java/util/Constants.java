@@ -10,8 +10,10 @@ import java.nio.charset.StandardCharsets;
 public final class Constants {
 
     // Arguments
-    public final static String BUILD_INDEX_SHORT = "-ci";
-    public final static String BUILD_INDEX_LONG = "--create-index";
+    public final static String BUILD_INDEX_SHORT = "ci";
+    public final static String BUILD_INDEX_LONG = "create-index";
+    public final static String CUSTOM_BM25_K1_VALUE = "k1";
+    public final static String CUSTOM_BM25_B_VALUE = "b";
 
     // Magic numbers
     public static final float DEFAULT_BM25_K1_VALUE = 1.2f;
