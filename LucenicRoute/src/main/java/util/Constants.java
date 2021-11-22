@@ -8,6 +8,10 @@ import java.nio.charset.StandardCharsets;
  * Constants file 
  */
 public final class Constants {
+
+    //Arguments
+    public final static String BUILD_INDEX_SHORT = "-ci";
+    public final static String BUILD_INDEX_LONG = "--create-index";
 	
 	public final static Integer MAX_RESULTS = 1400;
 	public final static String CONTENT = "Content";

@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 
 import index.CreateIndex;
 import parseDoc.FBISParser;
@@ -20,10 +23,24 @@ import util.Constants;
 public class Main {
 
 	public static void main(String[] args) {
-		CreateIndex createIndex = new CreateIndex();
+
+		boolean forceBuildIndex = false;
+
+		// Check arguments
+		if (args.length > 0) {
+			if (Constants.BUILD_INDEX_SHORT.equals(args[0]) || Constants.BUILD_INDEX_LONG.equals(args[0])) {
+				forceBuildIndex = true;
+			} else {
+				System.out.printf("Invalid option. To forcefully create a new index use %s or %s.\n", Constants.BUILD_INDEX_SHORT, Constants.BUILD_INDEX_LONG);
+			}
+		}
+
 		try {
-			createIndex.buildIndex();
-		} catch (IOException e) {
+			if (forceBuildIndex || !indexExists()) {
+				CreateIndex createIndex = new CreateIndex();
+				createIndex.buildIndex();
+			}
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 
@@ -35,5 +52,10 @@ public class Main {
 			System.out.println("Error while searching documents.");
 			System.out.println(e.getMessage());
 		}
+	}
+
+	public static boolean indexExists() throws IOException {
+		final Directory directory = FSDirectory.open(Paths.get(Constants.INDEX_DIRECTORY));
+		return DirectoryReader.indexExists(directory);
 	}
 }
