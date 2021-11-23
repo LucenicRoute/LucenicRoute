@@ -7,7 +7,7 @@ cd ../../..
 mvn clean package
 
 # Prepare results file
-echo -n "" > mapResults.txt
+echo -n "" > mapResults.csv
 printf "K1,b,map\n" >> mapResults.csv
 
 # Iterate through k1 and b values, writing values and map result to file
