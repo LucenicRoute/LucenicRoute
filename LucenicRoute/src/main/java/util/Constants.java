@@ -18,6 +18,7 @@ public final class Constants {
     // Magic numbers
     public static final float DEFAULT_BM25_K1_VALUE = 1.2f;
     public static final float DEFAULT_BM25_B_VALUE = 0.75f;
+    public static final int INITIAL_STOPWORD_SET_SIZE = 100;
 	
 	public final static Integer MAX_RESULTS = 1400;
 	public final static String CONTENT = "Content";
@@ -40,6 +41,7 @@ public final class Constants {
     public static final String END_OF_QUERY_PREFIX = "</top>";
 
     public static final String TOPIC_FILEPATH = "Input/topics";
+    public static final String STOPWORDS_FILEPATH = "Input/StopWords_GenericLong.txt";
     public static final String NUM_FIELD_KEY = "num";
     public static final String TITLE_FIELD_KEY = "title";
     public static final String DESC_FIELD_KEY = "desc";

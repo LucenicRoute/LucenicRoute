@@ -11,14 +11,13 @@ import java.util.Scanner;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.en.EnglishAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
 
 import util.Constants;
+import util.CustomAnalyzer;
 
 public class QueryReader {
     public List<Query> queries;
@@ -52,7 +51,7 @@ public class QueryReader {
         final List<String> processedQueries = processQueries(rawQueries);
         
         final String[] queryFields = new String[] {Constants.TITLE_QUERY_FIELD, Constants.CONTENT_QUERY_FIELD, Constants.AUTHOR_QUERY_FIELD};
-        final MultiFieldQueryParser parser = new MultiFieldQueryParser(queryFields, new StandardAnalyzer());
+        final MultiFieldQueryParser parser = new MultiFieldQueryParser(queryFields, new CustomAnalyzer());
         for (String processedQuery : processedQueries) {
             processedQuery = MultiFieldQueryParser.escape(processedQuery);
             final Query query = parser.parse(processedQuery);
@@ -125,7 +124,7 @@ public class QueryReader {
     // Removes punctuation
     public static String removeStopWords(final String text) throws IOException {
         final StringBuilder stringBuilder = new StringBuilder();
-        final Analyzer analyzer = new StandardAnalyzer(EnglishAnalyzer.getDefaultStopSet());
+        final Analyzer analyzer = new CustomAnalyzer();
         final TokenStream tokenStream = analyzer.tokenStream("CONTENTS", new StringReader(text));
         final CharTermAttribute term = tokenStream.addAttribute(CharTermAttribute.class);
         tokenStream.reset();
