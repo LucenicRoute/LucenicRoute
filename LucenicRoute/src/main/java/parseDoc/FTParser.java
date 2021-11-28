@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -16,36 +15,34 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import util.CreateDocument;
+import util.DocumentUtil;
 
 public class FTParser {
 
     private static String INPUT_DIR = "Input/ft/"; //directory containing Financial Times
 
-    public List<org.apache.lucene.document.Document> parseFT(IndexWriter indexWriter) throws IOException {
-        List<org.apache.lucene.document.Document> documentList = new ArrayList<org.apache.lucene.document.Document>();
+    public void parseFT(IndexWriter indexWriter) throws IOException {
         List<Path> directoryPaths = listDirPaths();
-        List<Path> filePaths = new ArrayList<Path>();
-
+        
         for (Path path : directoryPaths) {
             try (Stream<Path> fileWalk = Files.walk(path)) {
                 fileWalk.filter(Files::isRegularFile)
                         .forEach(file -> {
+                	DocumentUtil docUtil = null;
                     File currFile = new File(file.toString());
-                    String docID = null;
-                    String title = null;
-                    String content = null;
                     if (!currFile.getName().startsWith("read")) {
                         try {
                             Document currDoc = Jsoup.parse(currFile, "UTF-8");
-                            //System.out.println(currDoc);
-                            Elements elements = currDoc.select("doc");
+                            Elements elements = currDoc.select("DOC");
                             for (Element element : elements) {
-                                docID = element.select("docno").text();
-                                title = element.select("headline").text();
-                                content = element.select("text").text();
-                                org.apache.lucene.document.Document finalDoc = CreateDocument.createDocument(docID, title, content);
+                            	docUtil = new DocumentUtil();
+                        		docUtil.setDocNo(element.select("DOCNO").text());
+                        		docUtil.setHeadline(element.select("HEADLINE").text().replaceAll("[^a-zA-Z 0-9 ]", "".toLowerCase()));
+                        		docUtil.setContent(element.select("TEXT").text().replaceAll("[^a-zA-Z 0-9 ]", "".toLowerCase())); 
+                        		docUtil.setDate(element.select("DATE").text().replaceAll("[^a-zA-Z 0-9 ]", "".toLowerCase()));
+                        		docUtil.setPublication(element.select("PUB").text().replaceAll("[^a-zA-Z 0-9 ]", "".toLowerCase()));
+                                org.apache.lucene.document.Document finalDoc = CreateDocument.createDocument(docUtil);
                                 indexWriter.addDocument(finalDoc);
-                                //System.out.println(currLucDoc);
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -54,8 +51,6 @@ public class FTParser {
                 });
             }
         }
-
-        return documentList;
     }
 
 
@@ -70,16 +65,4 @@ public class FTParser {
         return filePaths;
 
     }
-
-//    public org.apache.lucene.document.Document createDocument(String docid, String title, String content)
-//    {
-//        org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
-//        doc.add(new TextField("id", docid, Field.Store.YES));
-//        doc.add(new TextField("title", title, Field.Store.YES));
-//        doc.add(new TextField("content", content, Field.Store.YES));
-//
-//        return doc;
-//    }
-
-
 }

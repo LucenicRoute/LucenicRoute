@@ -17,46 +17,34 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import util.CreateDocument;
+import util.DocumentUtil;
 
 public class LATimesParser {
 
 	String directory = "./Input/latimes";
 
-	//List<LATimesDocument> latDocsList = new ArrayList<LATimesDocument>();
 	List<String> filesPaths = new ArrayList<String>();
-//	List<org.apache.lucene.document.Document> luceneDocstList= new ArrayList<org.apache.lucene.document.Document>();
 
 	public void InitializeParsing(IndexWriter indexWriter) throws IOException {
 
 		try (Stream<Path> docPath = Files.walk(Paths.get(directory))) {
 			docPath.forEach(filePath -> filesPaths.add(filePath.toString()));
 		}
-
-//		String[] removePaths = { ".\\Input\\latimes", ".\\Input\\latimes\\readchg.txt", ".\\Input\\latimes\\readmela.txt" };
-//		
-//		for (String path : removePaths) {
-//			filesPaths.remove(path);
-//		}
 		
 		filesPaths.remove(732);
 		filesPaths.remove(731);
 		filesPaths.remove(0);
-
-		//System.out.println("The files are stored for Los Angeles Times. Completed...");
 		parseLATimes(filesPaths, indexWriter);
-//		return parseLATimes(filesPaths, indexWriter);
 	}
 
 	public void parseLATimes(List<String> docsList, IndexWriter indexWriter) throws IOException {
 
 		for (String docPath : docsList) {
-//			System.out.println("Parsing is starting for " + docPath);
 			try (InputStream stream = Files.newInputStream(Paths.get(docPath))) {
 				BufferedReader bufferedReader = new BufferedReader(
 						new InputStreamReader(stream, StandardCharsets.UTF_8));
 
 				String validRow = bufferedReader.readLine();
-				int i =0;
 				while (validRow != null) {
 					String wholeContent = "";
 					while (!validRow.equals("</DOC>")) {
@@ -68,46 +56,24 @@ public class LATimesParser {
 					}
 					wholeContent += validRow;
 					validRow = bufferedReader.readLine();
-
 					Document document = Jsoup.parse(wholeContent);
 					getFeaturesFromParsedDoc(document, indexWriter);
 				}
-//				System.out.println("Completed...");
 			}
 		}
-
-//		return luceneDocstList;
 	}
 
 	private void getFeaturesFromParsedDoc(Document doc, IndexWriter indexWriter) {
-
-//		LATimesDocument laDoc = new LATimesDocument();
-//
-//		laDoc.setDOC_NO(doc.select("DOCNO").text());
-//		laDoc.setDOC_ID(doc.select("DOCID").text());
-//		laDoc.setDATE(doc.select("DATE").text());
-//		laDoc.setSECTION(doc.select("SECTION").text());
-//		laDoc.setLENGTH(doc.select("LENGTH").text());
-//		laDoc.setHEADLINE(doc.select("HEADLINE").text());
-//		laDoc.setBYLINE(doc.select("BYLINE").text());
-//		laDoc.setTEXT(doc.select("TEXT").text());
-//		laDoc.setGRAPHIC(doc.select("GRAPHIC").text());
-//		laDoc.setTYPE(doc.select("TYPE").text());
-//		
-//		latDocsList.add(laDoc);
-		
-		String docNo = doc.select("DOCNO").text();
-    	String headline = doc.select("HEADLINE").text();
-		String text = doc.select("TEXT").text(); 
-
-		org.apache.lucene.document.Document midDoc = CreateDocument.createDocument(docNo,headline,text);
+		DocumentUtil docUtil = new DocumentUtil();
+		docUtil.setDocNo(doc.select("DOCNO").text());
+		docUtil.setHeadline(doc.select("HEADLINE").text().replaceAll("[^a-zA-Z 0-9 ]", "".toLowerCase()));
+		docUtil.setContent(doc.select("TEXT").text().replaceAll("[^a-zA-Z 0-9 ]", "".toLowerCase())); 
+		org.apache.lucene.document.Document midDoc = CreateDocument.createDocument(docUtil);
 		try {
 			indexWriter.addDocument(midDoc);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-//		luceneDocstList.add(midDoc);
 	}
 
 }

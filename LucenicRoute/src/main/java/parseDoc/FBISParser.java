@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.lucene.document.Document;
@@ -15,21 +13,18 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import util.CreateDocument;
+import util.DocumentUtil;
 
 public class FBISParser {
 	
 	public final static String INPUT_DIRECTORY = "Input/fbis/";
 	
 	public void getFBISDocs(IndexWriter indexWriter) throws IOException{
-		
-		List<Document> documentList = new ArrayList<>();
 		//read each file from the given location
 		try (Stream<Path> filePathStream=Files.walk(Paths.get(INPUT_DIRECTORY))) {
 			filePathStream.forEach(filePath -> {
+				DocumentUtil docUtil =null;
 				Document doc = null;
-				String documentNo = "";
-				String title = "";
-				String text = "";
 				if (Files.isRegularFile(filePath)) {
 					//get the file content
 					File file = new File(filePath.toString());
@@ -40,11 +35,13 @@ public class FBISParser {
 							Elements elements = d.select("DOC");
 							for (Element element : elements) {
 								doc = new Document();
-								documentNo = element.select("DOCNO").text();
-								title = element.select("HEADER").select("TI").text();
-								text = element.select("TEXT").text();
+								docUtil = new DocumentUtil();
+								docUtil.setDocNo(element.select("DOCNO").text());
+                        		docUtil.setHeadline(element.select("HEADER").select("TI").text().replaceAll("[^a-zA-Z 0-9 ]", "".toLowerCase()));
+                        		docUtil.setDate(element.select("HEADER").select("DATE1").text().replaceAll("[^a-zA-Z 0-9 ]", "".toLowerCase()));
+                        		docUtil.setContent(element.select("TEXT").text().replaceAll("[^a-zA-Z 0-9 ]", "".toLowerCase())); 
 								//create the document 
-								doc = CreateDocument.createDocument(documentNo, title, text);
+								doc = CreateDocument.createDocument(docUtil);
 								//add document to document list
 								indexWriter.addDocument(doc);
 							}
