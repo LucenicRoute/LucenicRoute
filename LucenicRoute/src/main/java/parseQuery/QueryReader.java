@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -23,9 +24,9 @@ public class QueryReader {
     public List<Query> queries;
     public List<String> queryIDs;
 
-    public QueryReader() {
+    public QueryReader(final Map<String, Float> boosts) {
         try {
-            constructQueries(Constants.TOPIC_FILEPATH);
+            constructQueries(boosts);
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
@@ -39,19 +40,18 @@ public class QueryReader {
         return this.queryIDs;
     }
 
-    public void constructQueries(final String filepath) throws IOException, ParseException {
+    public void constructQueries(final Map<String, Float> boosts) throws IOException, ParseException {
         final ArrayList<Query> returnQueries = new ArrayList<Query>();
         final ArrayList<String> returnQueryIDs = new ArrayList<String>();
 
-        final List<HashMap<String, String>> rawQueries = parseQueries(filepath);
+        final List<HashMap<String, String>> rawQueries = parseQueries(Constants.TOPIC_FILEPATH);
         for (HashMap<String,String> rawQuery : rawQueries) {
             returnQueryIDs.add(rawQuery.get(Constants.NUM_FIELD_KEY));
         }
 
         final List<String> processedQueries = processQueries(rawQueries);
         
-        final String[] queryFields = new String[] {Constants.TITLE_QUERY_FIELD, Constants.CONTENT_QUERY_FIELD, Constants.AUTHOR_QUERY_FIELD};
-        final MultiFieldQueryParser parser = new MultiFieldQueryParser(queryFields, new CustomAnalyzer());
+        final MultiFieldQueryParser parser = new MultiFieldQueryParser(Constants.DEFAULT_QUERY_FIELD_STRINGS, new CustomAnalyzer(), boosts);
         for (String processedQuery : processedQueries) {
             processedQuery = MultiFieldQueryParser.escape(processedQuery);
             final Query query = parser.parse(processedQuery);

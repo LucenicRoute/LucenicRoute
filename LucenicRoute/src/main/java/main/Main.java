@@ -2,6 +2,8 @@ package main;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Map;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.store.Directory;
@@ -25,6 +27,7 @@ public class Main {
 		boolean forceBuildIndex = false;
 		float customK1Value = Constants.DEFAULT_BM25_K1_VALUE;
 		float customBValue = Constants.DEFAULT_BM25_B_VALUE;
+		Map<String, Float> boosts = createBoostMap(Constants.DEFAULT_BOOST_VALUES);
 
 		// Check arguments
 		final Options options = new Options();
@@ -40,6 +43,11 @@ public class Main {
 								.hasArg()
 								.desc("Custom b value for BM25 similarity.")
 								.build());
+		options.addOption(Option.builder(Constants.CUSTOM_BOOST_VALUES)
+								.numberOfArgs(4)
+								.desc("Custom boost values for query fields.")
+								.valueSeparator(',')
+								.build());							
 		try {
 			final CommandLineParser parser = new DefaultParser();
 			final CommandLine cmd = parser.parse(options, args);
@@ -51,6 +59,10 @@ public class Main {
 			}
 			if (cmd.hasOption(Constants.CUSTOM_BM25_B_VALUE)) {
 				customBValue = Float.parseFloat(cmd.getOptionValue(Constants.CUSTOM_BM25_B_VALUE));
+			}
+			if (cmd.hasOption(Constants.CUSTOM_BOOST_VALUES)) {
+				Float[] boostValues = Arrays.stream(cmd.getOptionValues(Constants.CUSTOM_BOOST_VALUES)).map(Float::parseFloat).toArray(Float[]::new);
+				boosts = createBoostMap(boostValues);
 			}
 		} catch (final ParseException e) {
 			System.out.println("Invalid argument passed.");
@@ -71,7 +83,7 @@ public class Main {
 		searchEngine se = new searchEngine();
 		try {
 			System.out.printf("Using k1 value <%s> and b value <%s>.\n", customK1Value, customBValue);
-			se.searching(customK1Value, customBValue);
+			se.searching(customK1Value, customBValue, boosts);
 			System.out.println("Searching completed successfully.");
 		} catch (final IOException e) {
 			System.out.printf("Error while searching documents.\n%s\n",e.getMessage());
@@ -81,5 +93,10 @@ public class Main {
 	public static boolean indexExists() throws IOException {
 		final Directory directory = FSDirectory.open(Paths.get(Constants.INDEX_DIRECTORY));
 		return DirectoryReader.indexExists(directory);
+	}
+
+	// Creates a Map of fields to boost values. Assumes that four fields are being searched, and four boost values are supplied.
+	public static Map<String, Float> createBoostMap(final Float[] boostValues) {
+		return Map.of(Constants.TITLE, boostValues[0], Constants.CONTENT,  boostValues[1], Constants.DATE, boostValues[2], Constants.PUBLICATION,  boostValues[3]);
 	}
 }

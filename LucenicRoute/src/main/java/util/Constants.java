@@ -10,10 +10,11 @@ import java.nio.charset.StandardCharsets;
 public final class Constants {
 
     // Arguments
-    public final static String BUILD_INDEX_SHORT = "ci";
-    public final static String BUILD_INDEX_LONG = "create-index";
-    public final static String CUSTOM_BM25_K1_VALUE = "k1";
-    public final static String CUSTOM_BM25_B_VALUE = "b";
+    public static final String BUILD_INDEX_SHORT = "ci";
+    public static final String BUILD_INDEX_LONG = "create-index";
+    public static final String CUSTOM_BM25_K1_VALUE = "k1";
+    public static final String CUSTOM_BM25_B_VALUE = "b";
+    public static final String CUSTOM_BOOST_VALUES = "boosts";
 
     // Magic numbers
     public static final float DEFAULT_BM25_K1_VALUE = 1.2f;
@@ -30,6 +31,8 @@ public final class Constants {
 	public static final String INDEX_DIRECTORY = "index/";
 
 	// Query constants
+    public static final String[] DEFAULT_QUERY_FIELD_STRINGS = new String[] {Constants.TITLE, Constants.CONTENT, Constants.DATE, Constants.PUBLICATION};
+    public static final Float[] DEFAULT_BOOST_VALUES = new Float[] {1f,1f,1f,1f};
     public static final String TITLE_QUERY_FIELD = "Title";
     public static final String CONTENT_QUERY_FIELD = "Content";
     public static final String AUTHOR_QUERY_FIELD = "Author";

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
@@ -44,9 +45,9 @@ public class searchEngine {
 		wr.flush();
 	}
 	
-	public void searching(final float customK1Value, final float customBValue) throws IOException {
+	public void searching(final float customK1Value, final float customBValue, final Map<String, Float> boosts) throws IOException {
 		
-		QueryReader qr = new QueryReader();
+		QueryReader qr = new QueryReader(boosts);
 		List<Query> queriesList= qr.retrieveQueries();
 		List<String> queryIDs = qr.getQueryIDs();	
 		IndexReader rdr = DirectoryReader.open(FSDirectory.open(Paths.get(Constants.INDEX_DIRECTORY)));
