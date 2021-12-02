@@ -3,6 +3,7 @@ package main;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.index.DirectoryReader;
@@ -97,6 +98,12 @@ public class Main {
 
 	// Creates a Map of fields to boost values. Assumes that four fields are being searched, and four boost values are supplied.
 	public static Map<String, Float> createBoostMap(final Float[] boostValues) {
-		return Map.of(Constants.TITLE, boostValues[0], Constants.CONTENT,  boostValues[1], Constants.DATE, boostValues[2], Constants.PUBLICATION,  boostValues[3]);
+		Map<String, Float> returnMap = new HashMap<String, Float>() {{
+			put(Constants.TITLE, boostValues[0]);
+			put(Constants.CONTENT,  boostValues[1]);
+			put(Constants.DATE, boostValues[2]);
+			put(Constants.PUBLICATION,  boostValues[3]);
+		}};
+		return returnMap;
 	}
 }
