@@ -52,6 +52,8 @@ public final class Constants {
     public static final String STOPWORDS_FILEPATH = "Input/StopWords_GenericLong.txt";
     public static final String SENTENCE_DETECT_MODEL_FILEPATH = "Input/opennlp-en-ud-ewt-sentence-1.0-1.9.3.bin";
     public static final Set<String> NEGATIVE_TERM_SET = new HashSet<String>(Arrays.asList("irrelevant", "not relevant"));
+    public static final String SYNONYM_FILEPATH = "Input/wn_s.pl";
+    //public static final String STOPWORDS_FILEPATH = "Input/terrier_stopword_list.txt";
     public static final String NUM_FIELD_KEY = "num";
     public static final String TITLE_FIELD_KEY = "title";
     public static final String DESC_FIELD_KEY = "desc";
