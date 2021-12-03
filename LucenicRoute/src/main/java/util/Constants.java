@@ -2,6 +2,9 @@ package util;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Anuradha Vishwakarma
@@ -32,7 +35,7 @@ public final class Constants {
 
 	// Query constants
     public static final String[] DEFAULT_QUERY_FIELD_STRINGS = new String[] {Constants.TITLE, Constants.CONTENT, Constants.DATE, Constants.PUBLICATION};
-    public static final Float[] DEFAULT_BOOST_VALUES = new Float[] {1f,1f,1f,1f};
+    public static final Float[] DEFAULT_BOOST_VALUES = new Float[] {1f,5f,1f,0f};
     public static final String TITLE_QUERY_FIELD = "Title";
     public static final String CONTENT_QUERY_FIELD = "Content";
     public static final String AUTHOR_QUERY_FIELD = "Author";
@@ -47,6 +50,8 @@ public final class Constants {
 
     public static final String TOPIC_FILEPATH = "Input/topics";
     public static final String STOPWORDS_FILEPATH = "Input/StopWords_GenericLong.txt";
+    public static final String SENTENCE_DETECT_MODEL_FILEPATH = "Input/opennlp-en-ud-ewt-sentence-1.0-1.9.3.bin";
+    public static final Set<String> NEGATIVE_TERM_SET = new HashSet<String>(Arrays.asList("irrelevant", "not relevant"));
     public static final String NUM_FIELD_KEY = "num";
     public static final String TITLE_FIELD_KEY = "title";
     public static final String DESC_FIELD_KEY = "desc";

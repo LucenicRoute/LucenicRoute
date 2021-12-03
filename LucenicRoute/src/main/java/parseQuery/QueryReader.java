@@ -1,6 +1,8 @@
 package parseQuery;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
@@ -17,6 +20,8 @@ import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
 
+import opennlp.tools.sentdetect.SentenceDetectorME;
+import opennlp.tools.sentdetect.SentenceModel;
 import util.Constants;
 import util.CustomAnalyzer;
 
@@ -107,16 +112,51 @@ public class QueryReader {
         final ArrayList<String> processedQueries = new ArrayList<>();
         StringBuilder stringBuilder = new StringBuilder();
         for (final HashMap<String,String> rawQuery : rawQueries) {
+
             final String processedTitle = removeStopWords(rawQuery.get(Constants.TITLE_FIELD_KEY));
-            final String processedDesc = removeStopWords(rawQuery.get(Constants.DESC_FIELD_KEY));
-            final String processedNarr = removeStopWords(rawQuery.get(Constants.NARR_FIELD_KEY));
             stringBuilder.append(processedTitle);
+
+            final String processedDesc = removeStopWords(rawQuery.get(Constants.DESC_FIELD_KEY));
             stringBuilder.append(processedDesc);
+
+            final String[] narrSentences = tokenizeToSentences(rawQuery.get(Constants.NARR_FIELD_KEY));
+            final String[] positiveNarrSentences = removeNegativeSentences(narrSentences);
+            final String processedNarr = removeStopWords(String.join("", positiveNarrSentences));
             stringBuilder.append(processedNarr);
+
             processedQueries.add(stringBuilder.toString());
             stringBuilder = new StringBuilder();
         }
         return processedQueries;
+    }
+
+    /*
+     * Input: String of text
+     * Output: Array of sentences found within the input text
+     * Tokenises text into sentences using OpenNLP sentence detector and sentence model found at https://opennlp.apache.org/models.html.
+    */
+    public static String[] tokenizeToSentences(final String text) throws IOException {
+        final InputStream inputStream = new FileInputStream(Constants.SENTENCE_DETECT_MODEL_FILEPATH);
+        final SentenceModel model = new SentenceModel(inputStream);
+        SentenceDetectorME sentenceDetector = new SentenceDetectorME(model);
+        final String[] sentences = sentenceDetector.sentDetect(text);
+        inputStream.close();
+        return sentences;
+    }
+
+    /*
+     * Input: An array of sentences
+     * Ouput: An array of sentences
+     * Removes any sentences which contain the terms "irrelevant" or "not relevant", and returns the rest of the input sentences.
+    */
+    public static String[] removeNegativeSentences(final String[] inputSentences) {
+        ArrayList<String> returnSentences = new ArrayList<String>();
+        for (String sentence: inputSentences) {
+            if (!containsWord(Constants.NEGATIVE_TERM_SET, sentence)) {
+                returnSentences.add(sentence);
+            }
+        }
+        return returnSentences.toArray(new String[returnSentences.size()]);
     }
 
     // Removes stop words from a given string
@@ -136,4 +176,13 @@ public class QueryReader {
         analyzer.close();
         return stringBuilder.toString();
     }
+
+    public static boolean containsWord(final Set<String> words, final String sentence) {
+        for (final String word : words) {
+          if (sentence.contains(word)) {
+            return true;
+          }
+        }
+        return false;
+      }
 }
