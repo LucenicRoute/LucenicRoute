@@ -35,7 +35,7 @@ public final class Constants {
 
 	// Query constants
     public static final String[] DEFAULT_QUERY_FIELD_STRINGS = new String[] {Constants.TITLE, Constants.CONTENT, Constants.DATE, Constants.PUBLICATION};
-    public static final Float[] DEFAULT_BOOST_VALUES = new Float[] {1f,5f,1f,0f};
+    public static final Float[] DEFAULT_BOOST_VALUES = new Float[] {1f,7f,1f,1f};
     public static final String TITLE_QUERY_FIELD = "Title";
     public static final String CONTENT_QUERY_FIELD = "Content";
     public static final String AUTHOR_QUERY_FIELD = "Author";
