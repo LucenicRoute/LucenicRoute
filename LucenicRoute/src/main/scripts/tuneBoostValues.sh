@@ -25,6 +25,7 @@ RESULT=$(trec_eval -m map qrels-assignment2.part1 results)
 [[ $RESULT =~ $PATTERN ]]
 MAP_RESULT=${BASH_REMATCH[0]}
 printf "$TITLE_BOOST,$CONTENT_BOOST,$DATE_BOOST,$PUBLICATION_BOOST,$MAP_RESULT\n" >> mapResultsForBoosts.csv
+printf "$TITLE_BOOST,$CONTENT_BOOST,$DATE_BOOST,$PUBLICATION_BOOST,$MAP_RESULT\n"
 done
 done
 done
