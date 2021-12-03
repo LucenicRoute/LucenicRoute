@@ -24,6 +24,7 @@ import opennlp.tools.sentdetect.SentenceDetectorME;
 import opennlp.tools.sentdetect.SentenceModel;
 import util.Constants;
 import util.CustomAnalyzer;
+import util.QueryAnalyzer;
 
 public class QueryReader {
     public List<Query> queries;
@@ -56,7 +57,7 @@ public class QueryReader {
 
         final List<String> processedQueries = processQueries(rawQueries);
         
-        final MultiFieldQueryParser parser = new MultiFieldQueryParser(Constants.DEFAULT_QUERY_FIELD_STRINGS, new CustomAnalyzer(), boosts);
+        final MultiFieldQueryParser parser = new MultiFieldQueryParser(Constants.DEFAULT_QUERY_FIELD_STRINGS, new QueryAnalyzer(), boosts);
         for (String processedQuery : processedQueries) {
             processedQuery = MultiFieldQueryParser.escape(processedQuery);
             final Query query = parser.parse(processedQuery);
@@ -164,7 +165,7 @@ public class QueryReader {
     // Removes punctuation
     public static String removeStopWords(final String text) throws IOException {
         final StringBuilder stringBuilder = new StringBuilder();
-        final Analyzer analyzer = new CustomAnalyzer();
+        final Analyzer analyzer = new QueryAnalyzer();
         final TokenStream tokenStream = analyzer.tokenStream("CONTENTS", new StringReader(text));
         final CharTermAttribute term = tokenStream.addAttribute(CharTermAttribute.class);
         tokenStream.reset();
