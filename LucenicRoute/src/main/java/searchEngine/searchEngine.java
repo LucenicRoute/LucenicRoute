@@ -53,9 +53,11 @@ public class searchEngine {
 		IndexReader rdr = DirectoryReader.open(FSDirectory.open(Paths.get(Constants.INDEX_DIRECTORY)));
 		PrintWriter wr = new PrintWriter(RESULT_DIRECTORY, "UTF-8");
         IndexSearcher isrch = new IndexSearcher(rdr);
+        //step of setting similarity with custom values
 		isrch.setSimilarity(new BM25Similarity(customK1Value, customBValue));
         
         for (int i=0; i<queriesList.size(); i++) {
+        	//sends each query to the searchAndWrite function.
         	searchAndWrite(queriesList.get(i), queryIDs.get(i), isrch, wr);
 		}
 		
