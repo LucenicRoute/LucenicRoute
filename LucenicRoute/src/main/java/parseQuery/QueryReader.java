@@ -18,6 +18,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 
 import opennlp.tools.sentdetect.SentenceDetectorME;
@@ -56,10 +57,15 @@ public class QueryReader {
         }
 
         final List<String> processedQueries = processQueries(rawQueries);
+
+        BooleanQuery.setMaxClauseCount(4096);
         
         final MultiFieldQueryParser parser = new MultiFieldQueryParser(Constants.DEFAULT_QUERY_FIELD_STRINGS, new QueryAnalyzer(), boosts);
         for (String processedQuery : processedQueries) {
             processedQuery = MultiFieldQueryParser.escape(processedQuery);
+            System.out.println("Query:");
+            System.out.println(processedQuery.toString());
+            System.out.println();
             final Query query = parser.parse(processedQuery);
             returnQueries.add(query);
         }

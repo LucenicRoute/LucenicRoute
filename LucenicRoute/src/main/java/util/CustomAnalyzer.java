@@ -12,6 +12,7 @@ import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.en.EnglishPossessiveFilter;
 import org.apache.lucene.analysis.en.PorterStemFilter;
+import org.apache.lucene.analysis.miscellaneous.RemoveDuplicatesTokenFilter;
 import org.apache.lucene.analysis.snowball.SnowballFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.synonym.SynonymGraphFilter;
@@ -25,13 +26,15 @@ public class CustomAnalyzer extends Analyzer{
     protected TokenStreamComponents createComponents(final String fieldName) {
         final StandardTokenizer tokenizer = new StandardTokenizer();
         TokenStream tokenStream = new LowerCaseFilter(tokenizer);
+
         CharArraySet stopwordSet = processStopwords(Constants.STOPWORDS_FILEPATH);
+        tokenStream = new StopFilter(tokenStream, stopwordSet);
 
         tokenStream = new EnglishPossessiveFilter(tokenStream);
 
         //tokenStream = new SynonymGraphFilter(tokenStream, synonyms, ignoreCase)
 
-        tokenStream = new StopFilter(tokenStream, stopwordSet);
+        tokenStream = new SnowballFilter(tokenStream, "English");
 
         SynonymMap.Builder builder = new SynonymMap.Builder(true);
         builder.add(new CharsRef("USA"), new CharsRef("United States"), true);
@@ -44,7 +47,8 @@ public class CustomAnalyzer extends Analyzer{
             System.out.println("ERROR WITH SYNONYMS");
         }
 
-        tokenStream = new SnowballFilter(tokenStream, "English");
+        tokenStream = new RemoveDuplicatesTokenFilter(tokenStream);
+
         return new TokenStreamComponents(tokenizer, tokenStream);
     }
 
