@@ -20,8 +20,8 @@ public final class Constants {
     public static final String CUSTOM_BOOST_VALUES = "boosts";
 
     // Magic numbers
-    public static final float DEFAULT_BM25_K1_VALUE = 1.2f;
-    public static final float DEFAULT_BM25_B_VALUE = 0.75f;
+    public static final float DEFAULT_BM25_K1_VALUE = 0.6f;
+    public static final float DEFAULT_BM25_B_VALUE = 0.9f;
     public static final int INITIAL_STOPWORD_SET_SIZE = 100;
 	
 	public final static Integer MAX_RESULTS = 1400;
