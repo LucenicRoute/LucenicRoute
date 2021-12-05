@@ -2,9 +2,15 @@ package index;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
+import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
+import org.apache.lucene.analysis.standard.ClassicAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
@@ -24,9 +30,15 @@ import util.CustomAnalyzer;
 public class CreateIndex {
 
 	public void buildIndex() throws IOException {
+		//Per field analyzer
+		Map<String, Analyzer> analyzerMap = new HashMap<>();
+		analyzerMap.put(Constants.TITLE, new KeywordAnalyzer());
+		analyzerMap.put(Constants.CONTENT, new CustomAnalyzer());
+
 		//Connection to the path where index needs to be saved
 		Directory directory = FSDirectory.open(Paths.get(Constants.INDEX_DIRECTORY));
 		Analyzer analyzer = new CustomAnalyzer();
+//		Analyzer analyzer = new PerFieldAnalyzerWrapper(new ClassicAnalyzer(), analyzerMap);
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
 		IndexWriter iwriter = new IndexWriter(directory, config);
